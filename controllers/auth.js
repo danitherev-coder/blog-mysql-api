@@ -1,6 +1,7 @@
 import { db } from "../db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { request, response } from "express";
 
 export const register = (req, res) => {
   //CHECK EXISTING USER
@@ -24,7 +25,7 @@ export const register = (req, res) => {
   });
 };
 
-export const login = (req, res) => {
+export const login = (req = request, res = response) => {
   //CHECK USER
 
   const q = "SELECT * FROM users WHERE username = ?";
@@ -48,6 +49,8 @@ export const login = (req, res) => {
     res
       .cookie("access_token", token, {
         httpOnly: false,
+        secure: true,
+        maxAge: 3600000,
       })
       .status(200)
       .json(other);
