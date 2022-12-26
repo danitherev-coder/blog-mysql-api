@@ -65,7 +65,7 @@ app.post("/api/upload", upload.single("file"), function (req, res) {
       }
 
       // Si se subió correctamente, devolvemos el resultado
-      res.status(200).json(result);
+      res.status(200).json({result, file, msg: "se subio correctamente"});
     }).end(file.buffer);
   } catch (error) {
     // Manejo del error 500 aquí
