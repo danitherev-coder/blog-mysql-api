@@ -14,10 +14,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: ["https://hilarious-cobbler-0478cd.netlify.app"],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]  
+  origin: "https://hilarious-cobbler-0478cd.netlify.app"
 }))
 
 app.use(cookieParser());
