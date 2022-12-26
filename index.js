@@ -14,7 +14,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: ["http://localhost:3000", "https://hilarious-cobbler-0478cd.netlify.app"],
+  origin: ["https://hilarious-cobbler-0478cd.netlify.app"],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]  
