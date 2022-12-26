@@ -17,3 +17,9 @@ export const db = mysql2.createPool({
   database: "blog",
   port: 3306,
 })
+
+// USER = root
+// HOST = 127.0.0.1
+// PASSWORD = 70998513Daniel
+// DATABASE = blog
+// DB_PORT = 3306
