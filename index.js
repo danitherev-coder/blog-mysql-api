@@ -17,6 +17,10 @@ const app = express();
 app.use(cors({
   origin: /\.netlify\.app$/
 }))
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://hilarious-cobbler-0478cd.netlify.app");
+  next();
+});
 
 app.use(cookieParser());
 app.use(express.urlencoded({ limit: maxRequestSize, extended: true }));
