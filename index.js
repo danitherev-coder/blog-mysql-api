@@ -4,6 +4,7 @@ import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -12,6 +13,12 @@ const app = express();
 // const uid = new ShortUniqueId({ length: 5 })
 
 
+app.use(cors({
+  origin: ["http://localhost:3000", "https://hilarious-cobbler-0478cd.netlify.app"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]  
+}))
 
 app.use(cookieParser());
 app.use(express.urlencoded({ limit: maxRequestSize, extended: true }));
