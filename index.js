@@ -40,7 +40,7 @@ cloudinary.v2.config({
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "https://cloudinary.com/console/c-2a35432c90b0e4fd156dee7546cbb6/media_library/folders/c2a7cfd7aa09645a7a96f6d02a65974c88");
+    cb(null, "../client/public/uploads");
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + file.originalname);
