@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import cors from 'cors'
 import dotenv from 'dotenv'
-import cloudinary from ('cloudinary').v2
+import cloudinary from 'cloudinary';
 dotenv.config()
 
 const maxRequestSize = "50mb"
@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ limit: maxRequestSize, extended: true }));
 app.use(express.json({ limit: maxRequestSize }));
 
-cloudinary.config({ 
+cloudinary.v2.config({ 
   cloud_name: 'dpvk1flpp', 
   api_key: '751537179855646', 
   api_secret: '7OrSXAXhbbwJ45YYpbXq48LnbeY' 
