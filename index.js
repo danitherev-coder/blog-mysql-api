@@ -41,6 +41,14 @@ app.post("/api/upload", upload.single("file"), function (req, res) {
     return res.status(400).json("No File");
   }
 
+  try {
+    // Código para procesar la imagen y guardarla en el servidor
+  } catch (error) {
+    // Manejo del error 500 aquí
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+
   res.status(200).json(file.filename);
 });
 
