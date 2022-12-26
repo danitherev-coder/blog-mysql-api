@@ -17,14 +17,15 @@ const app = express();
 
 app.use(cors({
   origin: [/\.netlify\.app$/, "https://hilarious-cobbler-0478cd.netlify.app"],
-  credentials: true
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization ", "Access-Control-Allow-Credentials"], 
 }))
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://hilarious-cobbler-0478cd.netlify.app");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept", "Authorization", "Access-Control-Allow-Credentials");
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "https://hilarious-cobbler-0478cd.netlify.app");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept", "Authorization", "Access-Control-Allow-Credentials");
+//   res.setHeader('Access-Control-Allow-Credentials', true);
+//   next();
+// });
 
 
 app.use(cookieParser());
