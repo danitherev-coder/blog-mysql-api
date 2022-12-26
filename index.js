@@ -55,23 +55,21 @@ app.post("/api/upload", upload.single("file"), function (req, res) {
     return res.status(400).json("No File");
   }
 
-  try {
-    // Subimos el archivo a Cloudinary
-    cloudinary.uploader.upload_stream({ resource_type: 'image' }, function(error, result) {
-      // Si hay un error, manejamos el error 500 aquí
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
-
-      // Si se subió correctamente, devolvemos el resultado
-      res.status(200).json({result, msg: "se subio correctamente"});
-    }).end(file.buffer);
-  } catch (error) {
-    // Manejo del error 500 aquí
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  cloudinary.uploader.upload_stream({ resource_type: 'image' }, function(error, result) {
+    // Si hay un error, manejamos el error 500 aquí
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  
+    // Si se subió correctamente, devolvemos el resultado
+    if (result.public_id) {
+      res.status(200).json({ msg: "Archivo subido correctamente" });
+    } else {
+      res.status(500).json({ msg: "Error al subir el archivo" });
+    }
+  }).end(file.buffer);
+  
 });
 
 
