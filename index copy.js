@@ -42,24 +42,21 @@ cloudinary.v2.config({
 //   },
 // });
 
-
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
 const uploadImage = (imageBase64) => {
   // Configuramos las opciones para la subida
   const options = {
     resource_type: "image",
     file: imageBase64
   };
+
   return new Promise((resolve, reject) => {
     // Subimos la imagen a Cloudinary
-    cloudinary.uploader.upload(imageBase64, options, function (error, result) {
+    cloudinary.uploader.upload(imageBase64, options, function(error, result) {
       if (error) {
         console.error(error);
         reject(error);
       }
+
       if (result.public_id) {
         resolve(result.public_id);
       } else {
@@ -69,26 +66,40 @@ const uploadImage = (imageBase64) => {
   });
 };
 
-app.post("/api/upload", upload.single("file"), function (req, res, next) {
-  const file = req.file;
+
+app.post("/api/upload", function (req, res, next) {
+  const file = req.body.file;
 
   // Si la imagen no se ha proporcionado, mostramos un mensaje de error
   if (!file) {
     return res.status(400).json({ message: "No se ha proporcionado ningún archivo" });
   }
+
   // Convertimos el buffer de la imagen en una cadena de base64
-  const imageBase64 = file.buffer.toString("base64");
+  const imageBase64 = file.toString("base64");
+
+  // Configuramos las opciones para la subida
+  const options = {
+    resource_type: "image",
+    file: imageBase64
+  };
 
   // Subimos la imagen a Cloudinary
-  uploadImage(imageBase64)
-    .then(publicId => {
-      res.status(200).json({ message: "Archivo subido correctamente", publicId });
-    }).catch(error => {
-      console.log(error)
-      res.status(500).json({ message: "Error al subir el archivo" });
-    });
-});
+  cloudinary.uploader.upload(file.path,options, function (error, result) {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error al subir el archivo" });
+    }
 
+    if (result.public_id) {
+      res.status(200).json({ message: "Archivo subido correctamente" });
+      // next()
+    } else {
+      res.status(500).json({ message: "Error al subir el archivo" });
+    }
+  });
+  next()
+});
 
 // app.post("/api/upload", upload.single("file"), function (req, res) {
 //   const file = req.file;
