@@ -12,8 +12,8 @@ export const getPosts = (req, res) => {
   const pageSize = req.query.pageSize || 5;
 
   const q = req.query.cat
-    ? `SELECT * FROM posts WHERE cat=? ORDER BY date DESC LIMIT ? OFFSET ?`
-    : `SELECT * FROM posts ORDER BY date DESC LIMIT ? OFFSET ?`;
+    ? `SELECT * FROM posts WHERE cat=? ORDER BY createdAt DESC LIMIT ? OFFSET ?`
+    : `SELECT * FROM posts ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
 
   const params = req.query.cat
     ? [req.query.cat, parseInt(pageSize), parseInt((page - 1) * pageSize)]
@@ -37,10 +37,10 @@ export const getCategories = (req, res) => {
 
   // Si se especificó una categoría, incluye el filtro en la consulta
   if (cat) {
-    q = "SELECT * FROM posts WHERE cat=? ORDER BY date DESC LIMIT ? OFFSET ?";
+    q = "SELECT * FROM posts WHERE cat=? ORDER BY createdAt DESC LIMIT ? OFFSET ?";
     params = [cat, pageSize, (page - 1) * pageSize];
   } else {
-    q = "SELECT * FROM posts ORDER BY date DESC LIMIT ? OFFSET ?";
+    q = "SELECT * FROM posts ORDER BY createdAt DESC LIMIT ? OFFSET ?";
     params = [pageSize, (page - 1) * pageSize];
   }
 
