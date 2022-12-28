@@ -18,7 +18,7 @@ router.get("/:id", getPost);
 router.post("/", [
   body('title', 'EL titulo es obligatorio').notEmpty(),
   body('cat', 'La categoria es obligatoria').notEmpty(),
-  // body('img', 'La imagen es obligatoria').notEmpty(),
+  body('img', 'La imagen es obligatoria').notEmpty(),
   body('desc','La descripcion es obligatoria').notEmpty(),
   validarCampos
 ], addPost);
@@ -26,3 +26,4 @@ router.delete("/:id", deletePost);
 router.put("/:id", updatePost);
 
 export default router;
+

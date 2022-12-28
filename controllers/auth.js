@@ -44,13 +44,12 @@ export const login = (req = request, res = response) => {
       return res.status(400).json({ msg: "Wrong username or password!" });
 
     const token = jwt.sign({ id: data[0].id }, "jwtkey");
-    const { password, ...other } = data[0];
+      console.log(token);
 
-    res.cookie("access_token", token, {
-      httpOnly: false,
-      secure: false,
-      maxAge: 3600000,
-    }).status(200).json(other);
+
+    const { password, ...other } = data[0];
+    let datos = { ...other, token }
+    res.status(200).json(datos);
   });
 };
 
@@ -60,3 +59,4 @@ export const logout = (req, res) => {
     secure: true
   }).status(200).json({ msg: "User has been logged out." })
 };
+
