@@ -16,16 +16,16 @@ const app = express();
 
 
 app.use(cors({
-  origin: [/\.netlify\.app$/, "https://hilarious-cobbler-0478cd.netlify.app"],
+  origin: "https://dancing-elf-50ff80.netlify.app/",
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization ", "Access-Control-Allow-Credentials", "Set-Cookie"],
 }))
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "https://hilarious-cobbler-0478cd.netlify.app");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept", "Authorization", "Access-Control-Allow-Credentials");
-//   res.setHeader('Access-Control-Allow-Credentials', true);
-//   next();
-// });
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://dancing-elf-50ff80.netlify.app/");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept", "Authorization", "Access-Control-Allow-Credentials");
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+});
 
 app.use(express.static("public"));
 app.use(cookieParser());
@@ -33,15 +33,16 @@ app.use(express.urlencoded({ limit: maxRequestSize, extended: true }));
 app.use(express.json({ limit: maxRequestSize }));
 
 cloudinary.v2.config({
-  cloud_name: 'dpvk1flpp',
-  api_key: '751537179855646',
-  api_secret: '7OrSXAXhbbwJ45YYpbXq48LnbeY'
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
 });
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "../../client/public/upload");
-  },
+  // destination: function (req, file, cb) {
+  //   // cb(null, "../../client/public/upload");
+  //   cb(null,'../client/public/upload/')
+  // },
   filename: function (req, file, cb) {
     cb(null, Date.now() + file.originalname);
   },
@@ -51,15 +52,22 @@ const upload = multer({ storage });
 
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   try {
+    console.log(req.file.path);
     const uploadResponse = await cloudinary.v2.uploader.upload(req.file.path, {
       folder: 'test',
-      width: 300,
-      height: 300,
-      crop: "fill",
+      // width: 300,
+      // height: 300,
+      // crop: "fill",
+      // reducir pixeles de la imagen
+      // quality: "50",
+      // reducir tamaño de la imagen
+      q_auto: "good",
       public_id: Math.random() + "_image"
     });
 
-    res.json({ msg: "File uploaded", uploadResponse });
+    res.json({ msg: "File uploaded", uploadResponse, url: uploadResponse.public_id });
+    // res.json({ msg: "File uploaded", uploadResponse, url: uploadResponse.url });
+
   } catch (error) {
     // Maneja el error aquí
     console.error(error);

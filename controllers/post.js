@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+import cloudinary from 'cloudinary';
 
 export const getPosts = (req, res) => {
   const page = req.query.page || 1;
@@ -51,15 +52,35 @@ export const getCategories = (req, res) => {
   });
 };
 
+// export const getPost = (req, res) => {
+  
+//   const q = "SELECT p.id, `username`, `title`, `desc`, p.img, u.img AS userImg, `cat`,`date`, `updatedAt` FROM users AS u JOIN posts p ON u.id = p.uid WHERE p.id = ?";
+
+
+//   db.query(q, [req.params.id], (err, data) => {
+//     if (err) return res.status(500).json(err);
+//     return res.status(200).json(data[0]);
+//   });
+
+// };
+
 export const getPost = (req, res) => {
+  const postId = req.params.id;
+  const timeLimit = 1 * 60 * 1000;
+  const startTime = new Date().getTime();
+
   const q = "SELECT p.id, `username`, `title`, `desc`, p.img, u.img AS userImg, `cat`,`date`, `updatedAt` FROM users AS u JOIN posts p ON u.id = p.uid WHERE p.id = ?";
 
-
-  db.query(q, [req.params.id], (err, data) => {
+  db.query(q, [postId], (err, data) => {
     if (err) return res.status(500).json(err);
-    return res.status(200).json(data[0]);
-  });
 
+    const elapsedTime = new Date().getTime() - startTime;
+    if (elapsedTime > timeLimit) {
+      res.redirect("http://localhost:3000/");
+    } else {
+      return res.status(200).json(data[0]);
+    }
+  });
 };
 
 export const addPost = (req, res) => {
@@ -80,9 +101,24 @@ export const addPost = (req, res) => {
       userInfo.id,
     ];
 
+
     db.query(q, [values], (err, data) => {
       if (err) return res.status(500).json(err);
       return res.json("Post has been created.");
+    });
+  });
+};
+
+
+// obtener la imagen de cloudinary
+const deleteImg = (imagePublicId) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.v2.uploader.destroy(imagePublicId, (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve({result, msg: 'Imagen eliminada'});
+      }
     });
   });
 };
@@ -93,20 +129,71 @@ export const addPost = (req, res) => {
 
 //   jwt.verify(token, "jwtkey", (err, userInfo) => {
 //     if (err) return res.status(403).json("Token is not valid!");
-
 //     const postId = req.params.id;
-//     const q = "DELETE FROM posts WHERE `id` = ? AND `uid` = ?";
+//     console.log(postId);
+//     // retrieve the image public ID from the database
+//     const q = "SELECT img FROM posts WHERE `id` = ? AND `uid` = ?";
+    
+//     db.query(q, [postId], (err, data) => {
+//       if (err) return res.status(500).json("Error retrieving image public ID");
+      
+//       if (data.length > 0) {
+//         // delete the image from Cloudinary
+//         deleteImage(data[0].img)
+//           .then(() => {
+//             // delete the image from the database
+//             const q = "DELETE FROM img WHERE `post_id` = ?";
+//             db.query(q, [postId], (err, data) => {
+//               if (err) return res.status(500).json("Error deleting image");
 
+//               // delete the post from the database
+//               const q = "DELETE FROM posts WHERE `id` = ?"
+//               db.query(q, [postId], (err, data) => {
+//                 if (err) return res.status(500).json("Error deleting post");
+//                 return res.json("Post and image have been deleted!");
+//               });
+//             });
+//           })
+//           .catch((error) => {
+//             return res.status(500).json("Error deleting image from Cloudinary");
+//           });
+//       } else {
+//         // if the post does not have an image, just delete the post from the database
+//         const q = "DELETE FROM posts WHERE `id` = ?";
+//         db.query(q, [postId], (err, data) => {
+//           if (err) return res.status(500).json("Error deleting post");
+//           return res.json("Post has been deleted!");
+//         });
+//       }
+//     });
+//   })
+// }
+
+
+// este codigo me lo dio CHATGPT
+
+// export const deletePost = (req, res) => {
+//   const token = req.cookies.access_token;
+//   if (!token) return res.status(401).json("Not authenticated!");
+
+//   jwt.verify(token, "jwtkey", (err, userInfo) => {
+//     if (err) return res.status(403).json("Token is not valid!");
+//     const postId = req.params.id;
+//     const q = "SELECT img FROM posts WHERE `id` = ? AND `uid` = ?";
 //     db.query(q, [postId, userInfo.id], (err, data) => {
 //       if (err) return res.status(403).json("You can delete only your post!");
+//       // console.log(userInfo.id);
+//       // if the post does not have an image, just delete the post from the database
+//       const q = "DELETE FROM posts WHERE `id` = ?";
+//       db.query(q, [postId], (err, data) => {
+//         if (err) return res.status(500).json("Error deleting post");
+//         return res.json("Post has been deleted!");
+//       });
 
-//       return res.json("Post has been deleted!");
 //     });
 //   });
 // };
 
-
-// este codigo me lo dio CHATGPT
 
 export const deletePost = (req, res) => {
   const token = req.cookies.access_token;
@@ -114,38 +201,29 @@ export const deletePost = (req, res) => {
 
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
-
     const postId = req.params.id;
-
-
     const q = "SELECT img FROM posts WHERE `id` = ? AND `uid` = ?";
     db.query(q, [postId, userInfo.id], (err, data) => {
       if (err) return res.status(403).json("You can delete only your post!");
       // console.log(userInfo.id);
 
       if (data.length > 0) {
-        // retrieve the image path from the database
-        // const imagePath = data[0].img;
-        const imagePath = (path.join(__dirname, `../../client/public/upload/${data[0].img}`))
-        console.log(path.join(__dirname, `../../client/public/upload/${data[0].img}`))
-        // console.log(imagePath);
-        // conseguir la ruta de la imagen de la base de datos
-
-
-        // delete the image file
-        fs.unlink(imagePath, (err) => {
-          // comente esta linea porque no me permitia borrar el post porque no subi una imagen
-          // if (err) return res.status(500).json("Error deleting image file");
-
-          // delete the post from the database
-          const q = "DELETE FROM posts WHERE `id` = ?";
-          db.query(q, [postId], (err, data) => {
-            if (err) return res.status(500).json("Error deleting post");
-            return res.json("Post and image have been deleted!");
+        const imagePublicId = data[0].img;
+        deleteImg(imagePublicId)
+          .then(() => {
+            // eliminar el post de la base de datos
+            const q = "DELETE FROM posts WHERE `id` = ?";
+            db.query(q, [postId], (err, data) => {
+              if (err) return res.status(500).json("Error deleting post");
+              return res.json("Post and image have been deleted!");
+            });
+          })
+          .catch((error) => {
+            console.log(error)
+            return res.status(500).json("Error deleting image from Cloudinary");
           });
-        });
       } else {
-        // if the post does not have an image, just delete the post from the database
+        // si el post no tiene una imagen, simplemente elimina el post de la base de datos
         const q = "DELETE FROM posts WHERE `id` = ?";
         db.query(q, [postId], (err, data) => {
           if (err) return res.status(500).json("Error deleting post");
@@ -155,6 +233,7 @@ export const deletePost = (req, res) => {
     });
   });
 };
+
 
 export const updatePost = (req, res) => {
   const token = req.cookies.access_token;
