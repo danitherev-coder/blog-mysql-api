@@ -67,7 +67,7 @@ export const getPost = (req, res) => {
   const timeLimit = 1 * 60 * 1000;
   const startTime = new Date().getTime();
 
-  const q = "SELECT p.id, `username`, `title`, `desc`, p.img, u.img AS userImg, `cat`,`date`, `updatedAt` FROM users AS u JOIN posts p ON u.id = p.uid WHERE p.id = ?";
+  const q = "SELECT p.id, `username`, `title`, `desc`, p.img, u.img AS userImg, `cat`,`date`, `updatedAt`,`createdAt` FROM users AS u JOIN posts p ON u.id = p.uid WHERE p.id = ?";
 
   db.query(q, [postId], (err, data) => {
     if (err) return res.status(500).json(err);
