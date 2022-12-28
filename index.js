@@ -16,13 +16,13 @@ const app = express();
 
 
 app.use(cors({
-  origin: "https://dancing-elf-50ff80.netlify.app/",
+  origin: "https://dancing-elf-50ff80.netlify.app",
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization ", "Access-Control-Allow-Credentials", "Set-Cookie"],
-  
+
 }))
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://dancing-elf-50ff80.netlify.app/");
+  res.setHeader("Access-Control-Allow-Origin", "https://dancing-elf-50ff80.netlify.app");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept", "Authorization", "Access-Control-Allow-Credentials");
   res.setHeader('Access-Control-Allow-Credentials', true);
   next();
